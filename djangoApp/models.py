@@ -26,7 +26,7 @@ class Category(models.Model):
 class Product(models.Model):
     p_name = models.CharField(max_length=200)
     product_tag = models.ManyToManyField(Tag)
-    cat = models.OneToOneField(Category, on_delete=models.CASCADE, primary_key=True)
+    cat = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.p_name

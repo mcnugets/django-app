@@ -1,0 +1,35 @@
+[
+  {
+    "model": "djangoApp.tag",
+    "pk": 1,
+    "fields": {
+      "tag_name": "fullhd"
+    }
+  },
+  {
+    "model": "djangoApp.tag",
+    "pk": 2,
+    "fields": {
+      "tag_name": "m3"
+    }
+  },
+  {
+    "model": "djangoApp.Category",
+    "pk": 1,
+    "fields": {
+      "cat_name": "phone"
+    }
+  },
+  {
+    "model": "djangoApp.Product",
+    "pk": 1,
+    "fields": {
+      "p_name": "iphone 20",
+      "product_tag": [
+        1,
+        2
+      ],
+      "cat": 1
+    }
+  }
+]

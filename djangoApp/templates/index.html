@@ -9,32 +9,119 @@
     <link rel="stylesheet" type="text/css" href="{% static '/css/styles.css' %}">
 </head>
 <body>
-<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
 
-<table id="myTable">
-    <tr class="header">
-        <th style="width:60%;">Product</th>
-        <th style="width:40%;">Category</th>
-        <th style="width:40%;">Tag</th>
-    </tr>
-    <tr>
-        <td>Alfreds Futterkiste</td>
-        <td>Germany</td>
-    </tr>
-    <tr>
-        <td>Berglunds snabbkop</td>
-        <td>Sweden</td>
-    </tr>
-    <tr>
-        <td>Island Trading</td>
-        <td>UK</td>
-    </tr>
-    <tr>
-        <td>Koniglich Essen</td>
-        <td>Germany</td>
-    </tr>
-</table>
-</table>
+<form method="post" id="myForm">
+    {% csrf_token %}
+
+    <input type="text" id="key_word" onkeyup="request_table()" placeholder="filter table using keywords...">
+
+    <table id="myTable">
+        <tr class="header">
+            <th style="width:60%;">Product</th>
+            <th style="width:40%;">Category</th>
+            <th style="width:40%;">Tag</th>
+        </tr>
+        <tbody id="table_content">
+        {# dynamic code update#}
+
+
+        </tbody>
+
+
+    </table>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js">
+
+</script>
+
+<script>
+
+
+    async function default_table() {
+        try {
+
+            axios.defaults.xsrfCookieName = 'csrftoken';
+            axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+            document.addEventListener('DOMContentLoaded', async () => {
+                await axios.post('{{default_api_url}}')
+                    .then(response => {
+                        console.log('Status: ', response.status);
+                        console.log(response.data)
+
+
+                        const fromJson = response.data;
+                        console.log(fromJson.message)
+                        const table_content = document.getElementById('table_content')
+                        if (table_content) {
+                            table_content.textContent = ''
+                            fromJson.result.forEach((row) => {
+                                let tr = document.createElement('tr')
+
+                                Object.values(row).forEach((value) => {
+                                    let cell = document.createElement('td')
+                                    cell.textContent = value
+                                    tr.appendChild(cell)
+                                })
+
+                                table_content.appendChild(tr);
+                            })
+                        }
+
+                    }).catch(err => {
+                        console.log('Error', err.message)
+                    })
+
+            })
+        } catch (e) {
+            console.log('Error: ', e)
+        }
+    }
+
+    default_table()
+
+    async function request_table() {
+        axios.defaults.xsrfCookieName = 'csrftoken';
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+        const search = document.getElementById('key_word').value
+        console.log(search)
+        const json_data = {search: search}
+        await axios.post('{{filter_api_url}}', json_data, {
+            headers:
+                {
+                    'Content-Type': 'application/json',
+                }
+
+        }).then(response => {
+            console.log('Status: ', response.status);
+            console.log(response.data)
+
+
+            const fromJson = response.data;
+            console.log(fromJson.message)
+            const table_content = document.getElementById('table_content')
+            if (table_content) {
+                table_content.textContent = ''
+                fromJson.result.forEach((row) => {
+                    let tr = document.createElement('tr')
+
+                    Object.values(row).forEach((value) => {
+                        let cell = document.createElement('td')
+                        cell.textContent = value
+                        tr.appendChild(cell)
+                    })
+
+                    table_content.appendChild(tr);
+                })
+            }
+
+
+        }).catch(err => {
+            console.log('Error', err.message)
+        })
+    }
+
+</script>
 
 
 </body>
